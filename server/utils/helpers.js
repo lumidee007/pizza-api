@@ -27,7 +27,7 @@ const items = [
 ];
 
 // Example usage:
-console.log(calcTotal(items)); // Output: 10*2 + 12*1 + 11*3 = 65
+console.log(calcTotal(items));
 function calcTotalWithDiscount(items, discount) {
   const total = calcTotal(items);
   if (discount < 0 || discount > 100) {
