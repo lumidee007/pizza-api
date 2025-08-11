@@ -31,4 +31,12 @@ function createOrder(req, res) {
   }
 }
 
-module.exports = { createOrder };
+function getOrder(req, res) {
+  const order = orders.get(req.params.id);
+  if (!order) {
+    return res.status(404).json({ error: "Order not found" });
+  }
+  return res.json(order);
+}
+
+module.exports = { createOrder, getOrder };
