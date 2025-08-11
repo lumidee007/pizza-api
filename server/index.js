@@ -1,12 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 const menuRouter = require("./routes/menu.route.js");
+const orderRouter = require("./routes/order.route.js");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.use("/menu", menuRouter);
+app.use("/order", orderRouter);
 
 app.use((_req, res) => res.status(404).json({ error: "Route not found" }));
 
