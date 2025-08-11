@@ -1,4 +1,4 @@
-const newId = require("../utils/newId");
+const { newId } = require("../utils/helpers");
 const orders = new Map();
 
 function createOrder(req, res) {
