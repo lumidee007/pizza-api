@@ -2,36 +2,36 @@ function newId() {
   return Math.random().toString(36).slice(2, 10);
 }
 
+const cartDemo = [
+  { pizzaId: 6, name: "Vegetable", quantity: 1, unitPrice: 13, totalPrice: 13 },
+  {
+    pizzaId: 2,
+    name: "Capricciosa",
+    quantity: 2,
+    unitPrice: 14,
+    totalPrice: 28,
+  },
+];
+
 function calcTotal(items) {
-  return items.reduce((sum, it) => {
-    const p = menu.find((m) => m.id === it.pizzaId);
-    if (!p) throw new Error(`Pizza ${it.pizzaId} not found`);
-    const q = Number(it.qty || 0);
-    if (!Number.isFinite(q) || q <= 0)
-      throw new Error(`Invalid qty for pizza ${it.pizzaId}`);
-    return sum + p.unitPrice * q;
+  return items.reduce((sum, item) => {
+    const qty = Number(item.quantity || 0);
+    const price = Number(item.unitPrice || 0);
+
+    if (!Number.isFinite(qty) || qty <= 0) {
+      throw new Error(`Invalid quantity for pizza ${item.pizzaId}`);
+    }
+    if (!Number.isFinite(price) || price < 0) {
+      throw new Error(`Invalid unit price for pizza ${item.pizzaId}`);
+    }
+    return sum + price * qty;
   }, 0);
 }
 
-// Demo data
-const menu = [
-  { id: 1, name: "Margherita", unitPrice: 10 },
-  { id: 2, name: "Pepperoni", unitPrice: 12 },
-  { id: 3, name: "Veggie", unitPrice: 11 },
-];
-
-const items = [
-  { pizzaId: 1, qty: 2 },
-  { pizzaId: 2, qty: 1 },
-  { pizzaId: 3, qty: 3 },
-];
-
-// Example usage:
-console.log(calcTotal(items));
-function calcTotalWithDiscount(items, discount) {
+function calcTotalWithDiscount(items, discount = 0) {
   const total = calcTotal(items);
-  if (discount < 0 || discount > 100) {
-    throw new Error("Invalid discount value");
+  if (!Number.isFinite(discount) || discount < 0 || discount > 60) {
+    throw new Error("Invalid discount value. Must be between 0 and 100.");
   }
   return total - (total * discount) / 100;
 }
