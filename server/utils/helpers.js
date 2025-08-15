@@ -2,6 +2,18 @@ function newId() {
   return Math.random().toString(36).slice(2, 10);
 }
 
+const PRIORITY_RATE = 0.2;
+const TIMES = {
+  normal: { making: 25, delivery: 35 },
+  priority: { making: 20, delivery: 30 },
+};
+
+function etaISO(priority) {
+  const type = priority ? TIMES.priority : TIMES.normal;
+  const totalMinutes = type.making + type.delivery;
+  return new Date(Date.now() + totalMinutes * 60 * 1000).toISOString();
+}
+
 function calcTotal(items) {
   return items.reduce((sum, item) => {
     const qty = Number(item.quantity || 0);
@@ -25,4 +37,11 @@ function calcTotalWithDiscount(items, discount = 0) {
   return total - (total * discount) / 100;
 }
 
-module.exports = { newId, calcTotal, calcTotalWithDiscount };
+module.exports = {
+  newId,
+  calcTotal,
+  calcTotalWithDiscount,
+  etaISO,
+  PRIORITY_RATE,
+  TIMES,
+};

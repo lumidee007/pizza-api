@@ -1,5 +1,11 @@
 const { newId } = require("../utils/helpers");
 const orders = new Map();
+const {
+  calcTotal,
+  calcTotalWithDiscount,
+  PRIORITY_RATE,
+  etaISO,
+} = require("../utils/helpers");
 
 function createOrder(req, res) {
   try {
@@ -12,7 +18,12 @@ function createOrder(req, res) {
     if (!Array.isArray(cart) || cart.length === 0)
       return res.status(400).json({ error: "cart[] is required" });
 
+    const orderPrice = calcTotal(cart);
+    const priorityPrice = priority ? Math.round(orderPrice * PRIORITY_RATE) : 0;
+    const estimatedDelivery = etaISO(priority);
+
     const id = newId();
+
     const order = {
       id,
       customer: String(customer),
@@ -22,6 +33,8 @@ function createOrder(req, res) {
       cart,
       priority: !!priority,
       placedAt: new Date().toISOString(),
+      totalPrice: orderPrice + priorityPrice,
+      estimatedDelivery,
     };
 
     orders.set(id, order);
