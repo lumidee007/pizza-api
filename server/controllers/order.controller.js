@@ -1,11 +1,6 @@
 const { newId } = require("../utils/helpers");
 const orders = new Map();
-const {
-  calcTotal,
-  calcTotalWithDiscount,
-  PRIORITY_RATE,
-  etaISO,
-} = require("../utils/helpers");
+const { calcTotal, PRIORITY_RATE, etaISO } = require("../utils/helpers");
 
 function createOrder(req, res) {
   try {
@@ -19,7 +14,9 @@ function createOrder(req, res) {
       return res.status(400).json({ error: "cart[] is required" });
 
     const orderPrice = calcTotal(cart);
-    const priorityPrice = priority ? Math.round(orderPrice * PRIORITY_RATE) : 0;
+    const priorityPrice = priority
+      ? Number((orderPrice * PRIORITY_RATE).toFixed(2))
+      : 0;
     const estimatedDelivery = etaISO(priority);
 
     const id = newId();
@@ -29,11 +26,13 @@ function createOrder(req, res) {
       customer: String(customer),
       phone: String(phone),
       address: address ? String(address) : undefined,
-      status: "pending",
+      status: "preparing",
       cart,
       priority: !!priority,
+      orderPrice,
+      priorityPrice,
+      totalPrice: priority ? orderPrice + priorityPrice : orderPrice,
       placedAt: new Date().toISOString(),
-      totalPrice: orderPrice + priorityPrice,
       estimatedDelivery,
     };
 
@@ -52,4 +51,30 @@ function getOrder(req, res) {
   return res.json(order);
 }
 
-module.exports = { createOrder, getOrder };
+function updateOrder(req, res) {
+  const { id } = req.params;
+  const { priority } = req.body;
+
+  // Find the order
+  const order = orders.get(id);
+
+  if (!order) {
+    return res.status(404).json({ message: "Order not found" });
+  }
+
+  // Update priority
+  order.priority = priority;
+
+  // If priority is true, calculate priority price, else set it to 0
+  order.priorityPrice = priority ? order.totalPrice * PRIORITY_RATE : 0;
+
+  // Update totalPrice
+  order.totalPrice = order.totalPrice + order.priorityPrice;
+
+  return res.status(200).json({
+    message: "Order priority and price updated successfully",
+    order,
+  });
+}
+
+module.exports = { createOrder, getOrder, updateOrder };

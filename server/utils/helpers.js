@@ -16,25 +16,25 @@ function etaISO(priority) {
 
 function calcTotal(items) {
   return items.reduce((sum, item) => {
-    const qty = Number(item.quantity || 0);
-    const price = Number(item.unitPrice || 0);
+    const qty = item.quantity || 0;
+    const price = item.unitPrice || 0;
 
     if (!Number.isFinite(qty) || qty <= 0) {
-      throw new Error(`Invalid quantity for pizza ${item.pizzaId}`);
+      throw new Error(`Invalid quantity for pizza ${item.id}`);
     }
     if (!Number.isFinite(price) || price < 0) {
-      throw new Error(`Invalid unit price for pizza ${item.pizzaId}`);
+      throw new Error(`Invalid unit price for pizza ${item.id}`);
     }
     return sum + price * qty;
-  }, 0);
+  }, 0.0);
 }
 
-function calcTotalWithDiscount(items, discount = 0) {
+function calcTotalWithDiscount(items, discount) {
   const total = calcTotal(items);
-  if (!Number.isFinite(discount) || discount < 0 || discount > 100) {
-    throw new Error("Invalid discount value. Must be between 0 and 100.");
+  if (!Number.isFinite(discount) || discount < 0 || discount > 1) {
+    throw new Error("Invalid discount value. Must be between 0 and 1.");
   }
-  return total - (total * discount) / 100;
+  return total + total * discount;
 }
 
 module.exports = {
